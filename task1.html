@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Landing Page</title>
+  <style>
+    /* Global Resets */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background-color: #f9f9f9; color: #333; overflow-x: hidden; }
+    
+    /* Global Section Settings */
+    section { min-height: 100vh; padding: 100px 20px 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .container { max-width: 1200px; width: 100%; margin: 0 auto; text-align: center; }
+    .section-title { font-size: 36px; margin-bottom: 20px; color: #1e1e38; }
+    .section-subtitle { font-size: 18px; color: #666; margin-bottom: 50px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    
+    /* Scroll Fade-In Styles */
+    .fade-in-element { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+    .fade-in-element.is-visible { opacity: 1; transform: translateY(0); }
+    
+    /* Navbar Navigation Base Styling */
+    .navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background-color: transparent; padding: 20px 0; transition: all 0.4s ease; }
+    .navbar.scrolled { background-color: #ffffff; padding: 12px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+    .logo { font-size: 24px; font-weight: 700; text-decoration: none; color: #ffffff; transition: color 0.4s; }
+    .logo span { color: #00bcd4; }
+    .navbar.scrolled .logo { color: #1e1e38; }
+    .nav-links { display: flex; list-style: none; }
+    .nav-item { color: rgba(255,255,255,0.85); text-decoration: none; font-weight: 500; padding: 8px 16px; margin: 0 5px; border-radius: 4px; transition: all 0.3s; }
+    .nav-item:hover { color: #ffffff; background-color: rgba(255,255,255,0.15); }
+    .navbar.scrolled .nav-item { color: #555555; }
+    .navbar.scrolled .nav-item:hover { color: #3f51b5; background-color: rgba(63,81,181,0.1); }
+    
+    /* Mobile Hamburger Icon Setup */
+    .menu-toggle { display: none; flex-direction: column; cursor: pointer; background: transparent; border: none; }
+    .bar { width: 25px; height: 3px; background-color: white; margin: 4px 0; transition: all 0.3s; }
+    .navbar.scrolled .bar { background-color: #1e1e38; }
+    
+    /* Content Sections Styling */
+    .hero-section { background: linear-gradient(135deg, #1e1e38 0%, #3f51b5 100%); color: white; text-align: center; }
+    .hero-section h1 { font-size: 48px; margin-bottom: 20px; }
+    .hero-section p { font-size: 20px; opacity: 0.9; }
+    .about-section { background-color: #ffffff; }
+    .services-section { background-color: #f4f6f9; }
+    
+    /* Services Gallery CSS Grid Layout */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 20px; }
+    .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); background-color: #fff; height: 250px; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+    .gallery-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30,30,56,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; opacity: 0; transition: opacity 0.3s; padding: 20px; }
+    .gallery-item:hover img { transform: scale(1.1); }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+    .gallery-overlay h3 { font-size: 22px; margin-bottom: 10px; }
+    
+    /* Contact Form Layout Design */
+    .contact-section { background-color: #ffffff; }
+    .contact-form { max-width: 600px; margin: 0 auto; background: #fdfdfd; padding: 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: left; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
+    .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; transition: border-color 0.3s; }
+    .form-control:focus { outline: none; border-color: #3f51b5; }
+    textarea.form-control { resize: vertical; min-height: 120px; }
+    .submit-btn { display: inline-block; width: 100%; padding: 14px; background-color: #3f51b5; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+    .submit-btn:hover { background-color: #1e1e38; }
+    
+    /* Responsive Smartphone Breakpoints */
+    @media screen and (max-width: 768px) {
+      .menu-toggle { display: flex; }
+      .nav-links { position: absolute; top: 100%; right: -100%; width: 250px; height: calc(100vh - 100%); background-color: #1e1e38; flex-direction: column; align-items: center; padding-top: 40px; transition: right 0.4s; box-shadow: -4px 10px 10px rgba(0,0,0,0.1); }
+      .navbar.scrolled .nav-links { background-color: #ffffff; }
+      .nav-links.active { right: 0; }
+      .nav-item { margin: 15px 0; font-size: 18px; display: block; width: 100%; text-align: center; }
+      .menu-toggle.active .bar:nth-child(1) { transform: translateY(11px) rotate(45deg); }
+      .menu-toggle.active .bar:nth-child(2) { opacity: 0; }
+      .menu-toggle.active .bar:nth-child(3) { transform: translateY(-11px) rotate(-45deg); }
+      .hero-section h1 { font-size: 36px; }
+      .contact-form { padding: 25px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR STRUCTURE -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">Prodigy<span>Tech</span></a>
+      <button class="menu-toggle" id="mobile-menu" aria-label="Toggle navigation">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#home" class="nav-item">Home</a></li>
+        <li><a href="#about" class="nav-item">About</a></li>
+        <li><a href="#services" class="nav-item">Services</a></li>
+        <li><a href="#contact" class="nav-item">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HOME SECTION -->
+  <section id="home" class="hero-section">
+    <div class="container fade-in-element">
+      <h1>Welcome to Our Interactive Landing Page</h1>
+      <p>Scroll down to explore features, gallery grid, and animations.</p>
+    </div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section id="about" class="about-section">
+    <div class="container fade-in-element">
+      <h2 class="section-title">About Our Mission</h2>
+      <p class="section-subtitle">We craft performant digital spaces engineered with precision, exceptional responsive design, and intuitive interactivity metrics.</p>
+    </div>
+  </section>
+
+  <!-- SERVICES Grid Gallery SECTION -->
+  <section id="services" class="services-section">
+    <div class="container">
+      <div class="fade-in-element">
+        <h2 class="section-title">Our Services Gallery</h2>
+        <p class="section-subtitle">Hover over the gallery layout items to see the styling transitions and overlay interactivity details.</p>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item fade-in-element">
+          <img src="design.jpg" alt="Web Design">
+          <div class="gallery-overlay"><h3>Web Design</h3><p>Creating highly responsive UI mockups.</p></div>
+        </div>
+        <div class="gallery-item fade-in-element">
+          <img src="ui-ux.jpg" alt="UI/UX Architecture">
+          <div class="gallery-overlay"><h3>UI/UX Architecture</h3><p>Focusing entirely on smooth user journeys.</p></div>
+        </div>
+        <div class="gallery-item fade-in-element">
+          <img src="strategy.jpg" alt="Digital Strategy">
+          <div class="gallery-overlay"><h3>Digital Strategy</h3><p>Data analytics tracking framework insights.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT FORM SECTION -->
+  <section id="contact" class="contact-section">
+    <div class="container">
+      <div class="fade-in-element">
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="section-subtitle">Drop us a line using the interactive layout form processing wrapper down below.</p>
+      </div>
+      <form class="contact-form fade-in-element" id="contactForm" onsubmit="event.preventDefault(); alert('Form submitted successfully!');">
+        <div class="form-group"><label for="name">Your Name</label><input type="text" id="name" class="form-control" placeholder="John Doe" required></div>
+        <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" class="form-control" placeholder="john@example.com" required></div>
+        <div class="form-group"><label for="message">Message</label><textarea id="message" class="form-control" placeholder="Write your project requirements here..." required></textarea></div>
+        <button type="submit" class="submit-btn">Send Message</button>
+      </form>
+    </div>
+  </section>
+  <!-- JAVASCRIPT SYSTEM ENGINE LOGIC -->
+  <script>
+    // Component Query Selectors
+    const navbar = document.getElementById('navbar');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const navLinks = document.getElementById('nav-links');
+    const fadeElements = document.querySelectorAll('.fade-in-element');
+
+    // Scroll Active Toggling Rules
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) { navbar.classList.add('scrolled'); } 
+      else { navbar.classList.remove('scrolled'); }
+    });
+
+    // Mobile Hamburger Menu Activation Logic
+    mobileMenu.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+
+    // Close Mobile Drawer Panel on link interaction
+    document.querySelectorAll('.nav-item').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+        navLinks.classList.remove('active');
+      });
+    });
+
+    // Scroll Detection Fade-In Engine (Intersection Observer API)
+    const appearanceObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { root: null, threshold: 0.15, rootMargin: "0px" });
+
+    // Link observers onto page segments
+    fadeElements.forEach(element => appearanceObserver.observe(element));
+  </script>
+</body>
+</html>
